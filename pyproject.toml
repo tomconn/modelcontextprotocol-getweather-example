@@ -1,7 +1,7 @@
 [project]
 name = "get-weather-mcp"
 version = "0.1.0"
-description = "MCP server and client demo for the GetWeather Bedrock agent"
+description = "MCP server and client demo for the GetWeather service"
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]>=1.2.0",

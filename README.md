@@ -1,6 +1,6 @@
 # getWeatherMCP
 
-A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) demo that exposes an Australian weather tool backed by an AWS Bedrock Agent.
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) demo that exposes an Australian weather tool via a remote API.
 
 ```
 MCP Client (client.py)
@@ -9,7 +9,7 @@ MCP Client (client.py)
 MCP Server (server.py)
       │  HTTPS POST
       ▼
-API Gateway → Lambda Proxy → Bedrock Agent (GetWeather) → Knowledge Base
+Weather API
 ```
 
 ## Files
@@ -76,7 +76,7 @@ The server reads two environment variables. Both have working defaults pointing 
 
 | Variable | Default | Description |
 |---|---|---|
-| `WEATHER_API_ENDPOINT` | `https://nhy6ulzhfj.execute-api.ap-southeast-2.amazonaws.com/prod/weather` | API Gateway URL |
+| `WEATHER_API_ENDPOINT` | `https://nhy6ulzhfj.execute-api.ap-southeast-2.amazonaws.com/prod/weather` | Weather API endpoint URL |
 | `WEATHER_API_TOKEN` | `weather-poc-token-2026` | Bearer token sent in the `Authorization` header |
 
 Override them to point at a different environment:
@@ -101,13 +101,13 @@ Get the current weather for an Australian city.
 
 **Output**
 
-A plain-text string with the weather description returned by the Bedrock Agent.
+A plain-text string with the weather description returned by the weather API.
 
 **Error responses**
 
 | Condition | Returned string |
 |---|---|
-| HTTP error from API Gateway | `API error <status>: <body>` |
+| HTTP error from the weather API | `API error <status>: <body>` |
 | Network / timeout failure | `Request failed: <message>` |
 
 ## Running the tests
@@ -116,7 +116,7 @@ A plain-text string with the weather description returned by the Bedrock Agent.
 uv run --dev pytest
 ```
 
-All 29 tests run offline using mocks — no AWS credentials or network access required.
+All 29 tests run offline using mocks — no credentials or network access required.
 
 ```
 ============================= test session starts ==============================

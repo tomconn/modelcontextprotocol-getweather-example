@@ -1,4 +1,4 @@
-"""MCP server that wraps the GetWeather Bedrock Agent via API Gateway."""
+"""MCP server that exposes a get_weather tool backed by a remote weather API."""
 
 import os
 from typing import Any
