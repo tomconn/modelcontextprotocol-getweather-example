@@ -1,6 +1,7 @@
 """MCP server that exposes a get_weather tool backed by a remote weather API."""
 
 import os
+import sys
 from typing import Any
 
 import httpx
@@ -43,5 +44,23 @@ async def get_weather(city: str) -> str:
     return response if response is not None else str(data)
 
 
+def _assert_local_invocation() -> None:
+    """Exit if stdin is a TTY, which indicates an interactive or remote session.
+
+    This server communicates over stdio and must be launched as a subprocess
+    by a local MCP host.  A TTY on stdin means it is being run interactively
+    (e.g. directly in a shell or over SSH), which is not a supported use-case.
+    """
+    try:
+        if sys.stdin.isatty():
+            sys.exit(
+                "ERROR: This MCP server must be launched by a local MCP host "
+                "via stdio, not run interactively."
+            )
+    except AttributeError:
+        pass  # stdin replaced (e.g. during tests) — allow
+
+
 if __name__ == "__main__":
+    _assert_local_invocation()
     mcp.run(transport="stdio")

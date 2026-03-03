@@ -1,10 +1,44 @@
 """Unit tests for server.py."""
 
+import sys
 import pytest
 import httpx
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import server
+
+
+# ---------------------------------------------------------------------------
+# _assert_local_invocation
+# ---------------------------------------------------------------------------
+
+class TestAssertLocalInvocation:
+    def test_exits_when_stdin_is_tty(self, monkeypatch):
+        mock_stdin = MagicMock()
+        mock_stdin.isatty.return_value = True
+        monkeypatch.setattr(sys, "stdin", mock_stdin)
+        with pytest.raises(SystemExit):
+            server._assert_local_invocation()
+
+    def test_passes_when_stdin_is_pipe(self, monkeypatch):
+        mock_stdin = MagicMock()
+        mock_stdin.isatty.return_value = False
+        monkeypatch.setattr(sys, "stdin", mock_stdin)
+        server._assert_local_invocation()  # must not raise
+
+    def test_passes_when_stdin_has_no_isatty(self, monkeypatch):
+        """stdin replaced with a mock lacking isatty() — allow (e.g. test harnesses)."""
+        mock_stdin = MagicMock(spec=[])  # no attributes at all
+        monkeypatch.setattr(sys, "stdin", mock_stdin)
+        server._assert_local_invocation()  # must not raise
+
+    def test_exit_message_mentions_local(self, monkeypatch):
+        mock_stdin = MagicMock()
+        mock_stdin.isatty.return_value = True
+        monkeypatch.setattr(sys, "stdin", mock_stdin)
+        with pytest.raises(SystemExit) as exc_info:
+            server._assert_local_invocation()
+        assert "local" in str(exc_info.value).lower()
 
 
 # ---------------------------------------------------------------------------

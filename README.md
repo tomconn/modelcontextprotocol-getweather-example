@@ -61,14 +61,19 @@ Calling get_weather(city='Sydney') ...
 The current weather in Sydney is 25°C with sunny and clear skies.
 ```
 
+## Local-only enforcement
+
+The server uses stdio transport and is designed to run only as a subprocess on the local machine. At startup it checks whether `stdin` is a TTY — if so, it exits immediately with an error:
+
+```
+ERROR: This MCP server must be launched by a local MCP host via stdio, not run interactively.
+```
+
+This prevents the server being run directly in a shell, over SSH, or in any context where it is not piped to a local MCP client.
+
 ## Running the server standalone
 
-The server speaks the MCP stdio protocol and is not intended to be run directly, but you can confirm it starts cleanly:
-
-```bash
-uv run python server.py
-# Waits for JSON-RPC input on stdin — Ctrl-C to exit
-```
+The server speaks the MCP stdio protocol and is not intended to be run directly. Attempting to do so will trigger the local-only guard above. The correct entry point is `client.py`, which spawns the server automatically.
 
 ## Configuration
 
@@ -116,7 +121,7 @@ A plain-text string with the weather description returned by the weather API.
 uv run --dev pytest
 ```
 
-All 29 tests run offline using mocks — no credentials or network access required.
+All 33 tests run offline using mocks — no credentials or network access required.
 
 ```
 ============================= test session starts ==============================
